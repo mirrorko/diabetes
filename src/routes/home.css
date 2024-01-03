@@ -1,0 +1,48 @@
+.info {
+  margin: 20px 0px 20px 0px;
+}
+.info > .mobile {
+  height: 300px;
+  animation: enter-bottom 3s ease-in;
+}
+.slogan {
+  font-size: 45px;
+  animation: enter-bottom 1s ease-in;
+  color: #083171;
+  padding: 0px 10px;
+}
+@media (min-width: 992px) {
+  .info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0px 20px 0px;
+  }
+  .info > .mobile {
+    height: 700px;
+    animation: enter-bottom 3s ease-in;
+  }
+  .slogan {
+    margin-left: 40px;
+    font-weight: bolder;
+  }
+}
+
+@keyframes enter-right {
+  0% {
+    transform: translate3d(100%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes enter-bottom {
+  0% {
+    transform: translate3d(0, 100%, 0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
