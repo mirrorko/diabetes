@@ -1,9 +1,12 @@
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
+import { debounce } from "lodash";
+
+import { Avatar, Flex, Space, Layout, Menu, Button, Row, Col } from "antd";
 
 import { data } from "../lineData";
-import { Avatar, Flex, Space, Layout, Menu, Button, Row, Col } from "antd";
-import React, { useState, useRef } from "react";
+import { AppContext } from "./appContext";
 
 import {
   UserOutlined,
@@ -23,12 +26,29 @@ const { Sider, Content } = Layout;
 export default function Root() {
   const [current, setCurrent] = useState("blood");
   const [collapsed, setCollapsed] = useState(false);
-  const windowSize = useRef([window.innerWidth, window.innerHeight]);
-
-  const onClick = (e) => {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const toggleCollapsed = useCallback(() => {
+    setCollapsed(!collapsed);
+  }, [collapsed]);
+  const onClick = useCallback((e) => {
     console.log("click ", e);
     setCurrent(e.key);
-  };
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener(
+      "resize",
+      debounce(() => {
+        setWindowWidth(window.innerWidth);
+      })
+    );
+  }, []);
+
+  const contextValue = useMemo(() => {
+    return {
+      windowWidth,
+    };
+  }, [windowWidth]);
 
   return (
     <div className="App">
@@ -40,7 +60,7 @@ export default function Root() {
         size={[0, 48]}
       >
         <Layout>
-          {windowSize.current[0] > 600 && (
+          {windowWidth > 620 && (
             <Sider style={siderStyle} className="user">
               <img className="logo" alt="fire" src={logo} />
               <Flex
@@ -57,26 +77,40 @@ export default function Root() {
           )}
 
           <Layout>
-            {windowSize.current[0] <= 600 ? (
-              <Row className="logoPart">
-                <Col span={20}>
-                  <img className="logo" alt="fire" src={logo} />
-                </Col>
-                <Col span={4}>
-                  <Button
-                    type="text"
-                    icon={
-                      collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
-                    }
-                    onClick={() => setCollapsed(!collapsed)}
-                    style={{
-                      fontSize: "16px",
-                      width: 64,
-                      height: 64,
-                    }}
+            {windowWidth <= 620 ? (
+              <>
+                <Row className="logoPart">
+                  <Col span={20}>
+                    <img className="logo" alt="fire" src={logo} />
+                  </Col>
+                  <Col span={4}>
+                    <Button
+                      type="text"
+                      icon={
+                        collapsed ? (
+                          <MenuUnfoldOutlined />
+                        ) : (
+                          <MenuFoldOutlined />
+                        )
+                      }
+                      onClick={() => setCollapsed(!collapsed)}
+                      style={{
+                        fontSize: "16px",
+                        width: 64,
+                        height: 64,
+                      }}
+                    />
+                  </Col>
+                </Row>
+                {collapsed && (
+                  <Menu
+                    onClick={onClick}
+                    selectedKeys={[current]}
+                    mode="horizontal"
+                    items={navItems}
                   />
-                </Col>
-              </Row>
+                )}
+              </>
             ) : (
               <Menu
                 onClick={onClick}
@@ -85,14 +119,7 @@ export default function Root() {
                 items={navItems}
               />
             )}
-            {collapsed && (
-              <Menu
-                onClick={onClick}
-                selectedKeys={[current]}
-                mode="horizontal"
-                items={navItems}
-              />
-            )}
+
             <Content style={contentStyle}>
               <HighchartsReact highcharts={Highcharts} options={data} />
             </Content>

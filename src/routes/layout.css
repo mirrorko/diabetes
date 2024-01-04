@@ -30,7 +30,7 @@
   }
 }
 
-@media (min-width: 992px) {
+@media only screen and (min-width: 992px) {
   .logo {
     background: #fff;
     transform-style: preserve-3d;
